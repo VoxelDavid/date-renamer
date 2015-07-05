@@ -34,7 +34,7 @@ def is_image(path):
 class DateTimeOriginal:
     """DateTimeOriginal is the date that a photograph was taken.
 
-    This is an EXIF (exchangeable image file format)tag typically set by your camera when you take a picture,
+    This is an EXIF tag typically set by your camera when you take a picture,
     but it can also be set manually (depending on operating system).
 
     This is the most reliable date for a photograph, as "date created" and "date
