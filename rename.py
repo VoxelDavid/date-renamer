@@ -87,6 +87,18 @@ class File:
         date_modified = datetime.datetime.fromtimestamp(modification_time)
         return date_modified
 
+    def rename(self, new_name):
+        extension = os.path.splitext(self.name)[1]
+        new_name = new_name + extension
+        new_path = os.path.join(self.dir, new_name)
+
+        if not os.path.exists(new_path):
+            print("\"%s\" renamed to \"%s\"" % (self.name, new_name))
+            os.rename(self.path, new_path)
+            self.set_path(new_path)
+        else:
+            print("\"%s\" could not be renamed (\"%s\" already exists)" % (self.name, new_name))
+
 class Photo(File):
     def __init__(self, path, date_format="%Y-%m-%d %H.%M.%S"):
         super().__init__(path)
@@ -124,18 +136,6 @@ class Photo(File):
             return date_created.strftime(self.date_format)
         else:
             return date_modified.strftime(self.date_format)
-
-    def rename(self, new_name):
-        extension = os.path.splitext(self.name)[1]
-        new_name = new_name + extension
-        new_path = os.path.join(self.dir, new_name)
-
-        if not os.path.exists(new_path):
-            print("\"%s\" renamed to \"%s\"" % (self.name, new_name))
-            os.rename(self.path, new_path)
-            self.set_path(new_path)
-        else:
-            print("\"%s\" could not be renamed (\"%s\" already exists)" % (self.name, new_name))
 
 def main():
     args = docopt(__doc__)
