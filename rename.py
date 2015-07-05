@@ -60,7 +60,22 @@ class DateTimeOriginal:
 class File:
     """Generic class for handling file operations."""
     def __init__(self, path):
+        # Setting these could also be done by simply calling self.set_path().
+        # Opting for a more verbose approach so that you don't have to look to
+        # another function to find exactly what properties this class has.
         self.path = path
+        self.name = os.path.basename(path)
+        self.dir = os.path.dirname(path)
+
+    def set_path(self, new_path):
+        """Modifies all the path properties.
+
+        This needs to be called every time the file's path is changed (i.e.
+        after using os.rename) to keep the properties synced with the real file.
+        """
+        self.path = new_path
+        self.name = os.path.basename(new_path)
+        self.dir = os.path.dirname(new_path)
 
     def get_date_created(self):
         creation_time = os.path.getctime(self.path)
@@ -74,7 +89,7 @@ class File:
 
 class Photo(File):
     def __init__(self, path, date_format="%Y-%m-%d %H.%M.%S"):
-        self.path = path
+        super().__init__(path)
         self.date_format = date_format
 
     def has_exif_data(self):
@@ -111,17 +126,16 @@ class Photo(File):
             return date_modified.strftime(self.date_format)
 
     def rename(self, new_name):
-        extension = os.path.splitext(self.path)[1]
-        old_name = os.path.basename(self.path)
+        extension = os.path.splitext(self.name)[1]
         new_name = new_name + extension
-        new_path = os.path.join(os.path.dirname(self.path), new_name)
+        new_path = os.path.join(self.dir, new_name)
 
         if not os.path.exists(new_path):
-            print("\"%s\" renamed to \"%s\"" % (old_name, new_name))
+            print("\"%s\" renamed to \"%s\"" % (self.name, new_name))
             os.rename(self.path, new_path)
-            self.path = new_path
+            self.set_path(new_path)
         else:
-            print("\"%s\" could not be renamed (\"%s\" already exists)" % (old_name, new_name))
+            print("\"%s\" could not be renamed (\"%s\" already exists)" % (self.name, new_name))
 
 def main():
     args = docopt(__doc__)
