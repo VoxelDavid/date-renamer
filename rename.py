@@ -24,7 +24,7 @@ import os.path
 from docopt import docopt
 import piexif
 
-def isImage(path):
+def is_image(path):
     # imghdr.what will try to open() whatever is passed to it, ensure `path`
     # isn't a directory so it doesn't error.
     if os.path.isfile(path) and imghdr.what(path):
@@ -129,7 +129,7 @@ def main():
     for path, dirs, files in os.walk(args["<path>"]):
         for file in os.listdir(path):
             file_path = os.path.join(path, file)
-            if isImage(file_path):
+            if is_image(file_path):
                 photo = Photo(file_path, date_format=args["--format"])
                 photo.rename(photo.get_earliest_date())
 
