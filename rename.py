@@ -67,6 +67,9 @@ class File:
         self.name = os.path.basename(path)
         self.dir = os.path.dirname(path)
 
+    def has_sibling(self, file):
+        return os.path.exists(os.path.join(self.dir, file))
+
     def set_path(self, new_path):
         """Modifies all the path properties.
 
@@ -87,17 +90,34 @@ class File:
         date_modified = datetime.datetime.fromtimestamp(modification_time)
         return date_modified
 
+    def get_alternate_name(self, file):
+        """Returns a new name for the file that doesn't currently exist.
+
+        Sometimes you'll end up dealing with duplicate files, this method allows
+        you to get a name for your duplicates so you can save them properly.
+        """
+        name, ext = os.path.splitext(file)
+        existing_copies = 1
+        while True:
+            new_name = "%s (%s)%s" % (name, existing_copies, ext)
+            if not self.has_sibling(new_name):
+                return new_name
+            existing_copies += 1
+
     def rename(self, new_name):
         extension = os.path.splitext(self.name)[1]
         new_name = new_name + extension
         new_path = os.path.join(self.dir, new_name)
 
-        if not os.path.exists(new_path):
-            print("\"%s\" renamed to \"%s\"" % (self.name, new_name))
+        try:
             os.rename(self.path, new_path)
-            self.set_path(new_path)
-        else:
-            print("\"%s\" could not be renamed (\"%s\" already exists)" % (self.name, new_name))
+        except FileExistsError:
+            new_name = self.get_alternate_name(new_name)
+            new_path = os.path.join(self.dir, new_name)
+            os.rename(self.path, new_path)
+        finally:
+            print("\"%s\" renamed to \"%s\"" % (self.name, new_name))
+            self.path = new_path
 
 class Photo(File):
     def __init__(self, path, date_format="%Y-%m-%d %H.%M.%S"):
