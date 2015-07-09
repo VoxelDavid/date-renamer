@@ -116,15 +116,13 @@ class File:
         new_name = new_name + extension
         new_path = os.path.join(self.dir, new_name)
 
-        try:
-            os.rename(self.path, new_path)
-        except FileExistsError:
+        if self.path == new_path or os.path.exists(new_path):
             new_name = self.get_alternate_name(new_name)
             new_path = os.path.join(self.dir, new_name)
-            os.rename(self.path, new_path)
-        finally:
-            print("\"%s\" renamed to \"%s\"" % (self.name, new_name))
-            self.path = new_path
+
+        print("\"%s\" renamed to \"%s\"" % (self.name, new_name))
+        os.rename(self.path, new_path)
+        self.path = new_path
 
 class Photo(File):
     def __init__(self, path, date_format="%Y-%m-%d %H.%M.%S"):
