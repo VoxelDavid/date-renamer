@@ -68,6 +68,7 @@ class File:
         self.dir = os.path.dirname(path)
 
     def has_sibling(self, file):
+        """Checks if this File has `file` at the same path."""
         return os.path.exists(os.path.join(self.dir, file))
 
     def set_path(self, new_path):
@@ -81,11 +82,17 @@ class File:
         self.dir = os.path.dirname(new_path)
 
     def get_date_created(self):
+        """Returns the date that the file was created.
+
+        This is changed to the current date when a file is copied, so it might
+        not be the exact date you're looking for.
+        """
         creation_time = os.path.getctime(self.path)
         date_created = datetime.datetime.fromtimestamp(creation_time)
         return date_created
 
     def get_date_modified(self):
+        """Returns the date that the file was last modified."""
         modification_time = os.path.getmtime(self.path)
         date_modified = datetime.datetime.fromtimestamp(modification_time)
         return date_modified
@@ -125,6 +132,7 @@ class Photo(File):
         self.date_format = date_format
 
     def has_exif_data(self):
+        """Checks if the photo has any EXIF data."""
         file_type = imghdr.what(self.path)
         # JPEG and TIFF are the only files that piexif supports.
         if file_type == "jpeg" or file_type == "tiff":
@@ -132,6 +140,7 @@ class Photo(File):
         return False
 
     def get_exif_data(self):
+        """Returns the photos's EXIF data, if it exists."""
         if self.has_exif_data():
             return piexif.load(self.path)
 
@@ -142,6 +151,7 @@ class Photo(File):
             return date_taken.get_date()
 
     def get_earliest_date(self):
+        """Returns the earliest date that the photo was taken."""
         date_taken = self.get_date_taken()
         date_modified = self.get_date_modified()
         date_created = self.get_date_created()
