@@ -116,6 +116,9 @@ class File:
         new_name = new_name + extension
         new_path = os.path.join(self.dir, new_name)
 
+        if self.name == new_name:
+            return print("Skipping \"%s\" (already renamed)" % new_name)
+
         if self.path == new_path or os.path.exists(new_path):
             new_name = self.get_alternate_name(new_name)
             new_path = os.path.join(self.dir, new_name)
