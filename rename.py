@@ -31,32 +31,6 @@ def is_image(path):
         return True
     return False
 
-class DateTimeOriginal:
-    """DateTimeOriginal is the date that a photograph was taken.
-
-    This is an EXIF tag typically set by your camera when you take a picture,
-    but it can also be set manually (depending on operating system).
-
-    This is the most reliable date for a photograph, as "date created" and "date
-    modified" can change if a file is copied or saved, respectively.
-
-    http://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif/datetimeoriginal.html
-    """
-    def __init__(self, exif):
-        self.exif = exif
-
-        # ID for the DateTimeOriginal tag stored in the Exif data.
-        self.tag = 36867
-
-        # The standard format that cameras save the date as.
-        self.format = "%Y:%m:%d %H:%M:%S" # 2015:02:07 12:10:00
-
-    def get_date(self):
-        exif = self.exif["Exif"]
-        if self.tag in exif:
-            date = exif[self.tag].decode("utf-8")
-            return datetime.datetime.strptime(date, self.format)
-
 class File:
     """Generic class for handling file operations."""
     def __init__(self, path):
@@ -146,10 +120,28 @@ class Photo(File):
             return piexif.load(self.path)
 
     def get_date_taken(self):
+        """Gets the date the photograph was taken.
+
+        This makes use of the `DataTimeOriginal` Exif tag. It's typically set by
+        your camera when you take a picture.
+
+        This is the most reliable date for a photograph, as "date created" and
+        "date modified" can change if a file is copied or saved, respectively.
+
+        http://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif/datetimeoriginal.html
+        """
+
+        # ID for the DateTimeOriginal tag stored in the Exif data.
+        tag = 36867
+
+        # The standard format that cameras save the date as.
+        date_format = "%Y:%m:%d %H:%M:%S" # 2015:02:07 12:10:00
+
         if self.has_exif_data():
-            exif = self.get_exif_data()
-            date_taken = DateTimeOriginal(exif)
-            return date_taken.get_date()
+            exif = self.get_exif_data()["Exif"]
+            if tag in exif:
+                date = exif[tag].decode("utf-8")
+                return datetime.datetime.strptime(date, date_format)
 
     def get_earliest_date(self):
         """Returns the earliest date that the photo was taken."""
