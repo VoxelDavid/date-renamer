@@ -117,7 +117,7 @@ class File:
         new_path = os.path.join(self.dir, new_name)
 
         if self.name == new_name:
-            return print("Skipping \"%s\" (already renamed)" % new_name)
+            return
 
         if self.path == new_path or os.path.exists(new_path):
             new_name = self.get_alternate_name(new_name)
