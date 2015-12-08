@@ -57,10 +57,10 @@ class File:
         self.name = os.path.basename(path)
         self.dir = os.path.dirname(path)
 
-    def has_sibling(self, file):
-        """Checks if this File has `file` at the same path."""
+    def has_sibling(self, filename):
+        """Checks if this File has `filename` at the same path."""
 
-        return os.path.exists(os.path.join(self.dir, file))
+        return os.path.exists(os.path.join(self.dir, filename))
 
     def set_path(self, new_path):
         """Modifies all the path properties.
@@ -91,14 +91,14 @@ class File:
         date_modified = datetime.datetime.fromtimestamp(modification_time)
         return date_modified
 
-    def get_alternate_name(self, file):
+    def get_alternate_name(self, filename):
         """Returns a new name for the file that doesn't currently exist.
 
         Sometimes you'll end up dealing with duplicate files, this method allows
         you to get a name for your duplicates so you can save them properly.
         """
 
-        name, ext = os.path.splitext(file)
+        name, ext = os.path.splitext(filename)
         existing_copies = 1
 
         while True:
