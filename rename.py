@@ -31,6 +31,21 @@ def is_image(path):
         return True
     return False
 
+def get_images(path):
+    """Gets all image files in a directory.
+
+    path : str
+        The path to a directory to search through for images.
+    """
+
+    images = []
+    for file_name in os.listdir(path):
+        file_path = os.path.join(path, file_name)
+        if is_image(file_path):
+            images.append(file_path)
+
+    return images
+
 class File:
     """Generic class for handling file operations."""
 
@@ -174,13 +189,11 @@ class Photo(File):
 
 def main():
     args = docopt(__doc__)
+    images = get_images(args["<path>"])
 
-    for path, dirs, files in os.walk(args["<path>"]):
-        for file in os.listdir(path):
-            file_path = os.path.join(path, file)
-            if is_image(file_path):
-                photo = Photo(file_path, date_format=args["--format"])
-                photo.rename(photo.get_earliest_date())
+    for path in images:
+        photo = Photo(path, date_format=args["--format"])
+        photo.rename(photo.get_earliest_date())
 
 if __name__ == "__main__":
     main()
