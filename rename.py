@@ -33,6 +33,7 @@ def is_image(path):
 
 class File:
     """Generic class for handling file operations."""
+
     def __init__(self, path):
         # Setting these could also be done by simply calling self.set_path().
         # Opting for a more verbose approach so that you don't have to look to
@@ -43,6 +44,7 @@ class File:
 
     def has_sibling(self, file):
         """Checks if this File has `file` at the same path."""
+
         return os.path.exists(os.path.join(self.dir, file))
 
     def set_path(self, new_path):
@@ -51,6 +53,7 @@ class File:
         This needs to be called every time the file's path is changed (i.e.
         after using os.rename) to keep the properties synced with the real file.
         """
+
         self.path = new_path
         self.name = os.path.basename(new_path)
         self.dir = os.path.dirname(new_path)
@@ -61,12 +64,14 @@ class File:
         This is changed to the current date when a file is copied, so it might
         not be the exact date you're looking for.
         """
+
         creation_time = os.path.getctime(self.path)
         date_created = datetime.datetime.fromtimestamp(creation_time)
         return date_created
 
     def get_date_modified(self):
         """Returns the date that the file was last modified."""
+
         modification_time = os.path.getmtime(self.path)
         date_modified = datetime.datetime.fromtimestamp(modification_time)
         return date_modified
@@ -77,12 +82,16 @@ class File:
         Sometimes you'll end up dealing with duplicate files, this method allows
         you to get a name for your duplicates so you can save them properly.
         """
+
         name, ext = os.path.splitext(file)
         existing_copies = 1
+
         while True:
             new_name = "%s (%s)%s" % (name, existing_copies, ext)
+
             if not self.has_sibling(new_name):
                 return new_name
+
             existing_copies += 1
 
     def rename(self, new_name):
@@ -108,7 +117,9 @@ class Photo(File):
 
     def has_exif_data(self):
         """Checks if the photo has any EXIF data."""
+
         file_type = imghdr.what(self.path)
+
         # JPEG and TIFF are the only files that piexif supports.
         if file_type == "jpeg" or file_type == "tiff":
             return True
@@ -116,6 +127,7 @@ class Photo(File):
 
     def get_exif_data(self):
         """Returns the photos's EXIF data, if it exists."""
+
         if self.has_exif_data():
             return piexif.load(self.path)
 
@@ -145,6 +157,7 @@ class Photo(File):
 
     def get_earliest_date(self):
         """Returns the earliest date that the photo was taken."""
+
         date_taken = self.get_date_taken()
         date_modified = self.get_date_modified()
         date_created = self.get_date_created()
@@ -152,7 +165,6 @@ class Photo(File):
         # date_taken will only exist for JPEG and TIFF files, and even then
         # it's possible for the date to be missing. Ensure it exists before
         # comparing.
-
         if date_taken and date_taken < date_created:
             return date_taken.strftime(self.date_format)
         elif date_created < date_modified:
