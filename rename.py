@@ -121,7 +121,7 @@ class File:
             new_name = self.get_alternate_name(new_name)
             new_path = os.path.join(self.dir, new_name)
 
-        print("\"{}\" renamed to \"{}\"".format(self.name, new_name))
+        print("{} -> {}".format(self.name, new_name))
         os.rename(self.path, new_path)
         self.path = new_path
 
