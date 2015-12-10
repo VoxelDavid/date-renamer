@@ -114,16 +114,16 @@ class File:
         new_name = new_name + extension
         new_path = os.path.join(self.dir, new_name)
 
-        if self.name == new_name:
-            return
-
-        if self.path == new_path or os.path.exists(new_path):
-            new_name = self.get_alternate_name(new_name)
-            new_path = os.path.join(self.dir, new_name)
-
-        print("{} -> {}".format(self.name, new_name))
-        os.rename(self.path, new_path)
-        self.path = new_path
+        # We don't need to bother renaming it if the names match.
+        if self.name != new_name:
+            try:
+                os.rename(self.path, new_path)
+            except FileExistsError:
+                new_name = self.get_alternate_name(new_name)
+                new_path = os.path.join(self.dir, new_name)
+                os.rename(self.path, new_path)
+            finally:
+                print("{} -> {}".format(self.name, new_name))
 
 class Photo(File):
     def __init__(self, path, date_format="%Y-%m-%d %H.%M.%S"):
