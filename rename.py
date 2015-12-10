@@ -102,7 +102,7 @@ class File:
         existing_copies = 1
 
         while True:
-            new_name = "%s (%s)%s" % (name, existing_copies, ext)
+            new_name = "{} ({}){}".format(name, existing_copies, ext)
 
             if not self.has_sibling(new_name):
                 return new_name
